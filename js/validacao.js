@@ -65,6 +65,9 @@ const mensagensDeErro = {
   estado: {
     valueMissing: "O campo do estado não pode estar vazio",
   },
+  preco: {
+    valueMissing: "O campo do preço não pode estar vazio"
+  }
 };
 
 const monstraMensagemErro = (tipoDeInput, input) => {
@@ -169,6 +172,7 @@ const checaDigitoVerificador = (cpf, multiplicador) => {
   return false;
 };
 
+// CEP
 const recuperarCEP = (input) => {
   const cepFormatado = input.value.replace(/\D/g, "");
   const url = `https://viacep.com.br/ws/${cepFormatado}/json/`;
@@ -183,7 +187,6 @@ const recuperarCEP = (input) => {
     fetch(url, options)
       .then((resposta) => resposta.json())
       .then((data) => {
-        console.log(data);
         if (data.erro) {
           input.setCustomValidity("Não foi possível buscar este CEP");
           return;
