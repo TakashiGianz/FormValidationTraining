@@ -124,10 +124,13 @@
             <div class="input-container">
               <input
                 name="cep"
+                data-tipo="cep"
                 id="cep"
                 class="input"
                 type="text"
+                pattern="[\d]{5}-?[\d]{3}"
                 placeholder="CEP"
+                required
               />
               <label class="input-label" for="cep">CEP</label>
               <span class="input-mensagem-erro"
@@ -137,10 +140,12 @@
             <div class="input-container">
               <input
                 name="logradouro"
+                data-tipo="logradouro"
                 id="logradouro"
                 class="input"
                 type="text"
                 placeholder="Logradouro"
+                required
               />
               <label class="input-label" for="logradouro">Logradouro</label>
               <span class="input-mensagem-erro"
@@ -150,10 +155,12 @@
             <div class="input-container">
               <input
                 name="cidade"
+                data-tipo="cidade"
                 id="cidade"
                 class="input"
                 type="text"
                 placeholder="Cidade"
+                required
               />
               <label class="input-label" for="cidade">Cidade</label>
               <span class="input-mensagem-erro"
@@ -163,10 +170,12 @@
             <div class="input-container">
               <input
                 name="estado"
+                data-tipo="estado"
                 id="estado"
                 class="input"
                 type="text"
                 placeholder="Estado"
+                required
               />
               <label class="input-label" for="estado">Estado</label>
               <span class="input-mensagem-erro"

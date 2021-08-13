@@ -1,6 +1,8 @@
+// Validando e mostrando erros
 const validadores = {
   dataNascimento: (input) => validaDataNascimento(input),
   cpf: (input) => validaCPF(input),
+  cep: (input) => recuperarCEP(input),
 };
 
 export const valida = (input) => {
@@ -49,6 +51,20 @@ const mensagensDeErro = {
     valueMissing: "O campo de CPF não pode estar vazio",
     customError: "O CPF digitado não é válido",
   },
+  cep: {
+    valueMissing: "O campo de CEP não pode estar vazio",
+    patternMismatch: "O CEP digitado não é válido",
+    customError: "Não foi possível buscar o CEP",
+  },
+  logradouro: {
+    valueMissing: "O campo de logradouro não pode estar vazio",
+  },
+  cidade: {
+    valueMissing: "O campo da cidade não pode estar vazio",
+  },
+  estado: {
+    valueMissing: "O campo do estado não pode estar vazio",
+  },
 };
 
 const monstraMensagemErro = (tipoDeInput, input) => {
@@ -62,6 +78,7 @@ const monstraMensagemErro = (tipoDeInput, input) => {
   return mensagem;
 };
 
+// Verifica idade maior que 18 anos
 const validaDataNascimento = (input) => {
   const dataRecebida = new Date(input.value);
   let mensagem = "";
@@ -83,6 +100,7 @@ const maiorQue18 = (data) => {
   return dataMais18 <= dataAtual;
 };
 
+// CPF
 const validaCPF = (input) => {
   const cpfFormatado = input.value.replace(/\D/g, "");
   let mensagem = "";
@@ -124,7 +142,9 @@ const checaEstruturaCPF = (cpf) => {
 };
 
 const confirmaDigito = (soma) => {
-  return 11 - (soma % 11);
+  let resto = 11 - (soma % 11);
+  if (resto === 10 || resto === 11) resto = 0;
+  return resto;
 };
 
 const checaDigitoVerificador = (cpf, multiplicador) => {
@@ -147,4 +167,40 @@ const checaDigitoVerificador = (cpf, multiplicador) => {
   }
 
   return false;
+};
+
+const recuperarCEP = (input) => {
+  const cepFormatado = input.value.replace(/\D/g, "");
+  const url = `https://viacep.com.br/ws/${cepFormatado}/json/`;
+  const options = {
+    method: "GET",
+    mode: "cors",
+    headers: {
+      "content-type": "application/json;charset=utf-8",
+    },
+  };
+  if (!input.validity.patternMismatch && !input.validity.valueMissing) {
+    fetch(url, options)
+      .then((resposta) => resposta.json())
+      .then((data) => {
+        console.log(data);
+        if (data.erro) {
+          input.setCustomValidity("Não foi possível buscar este CEP");
+          return;
+        }
+        input.setCustomValidity("");
+        preencheCamposComCEP(data);
+        return;
+      });
+  }
+};
+
+const preencheCamposComCEP = (data) => {
+  const logradouro = document.querySelector('[data-tipo="logradouro"]');
+  const cidade = document.querySelector('[data-tipo="cidade"]');
+  const estado = document.querySelector('[data-tipo="estado"]');
+
+  logradouro.value = data.logradouro;
+  cidade.value = data.localidade;
+  estado.value = data.uf;
 };
