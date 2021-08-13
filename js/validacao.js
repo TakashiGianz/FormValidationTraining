@@ -1,3 +1,8 @@
+const validadores = {
+  dataNascimento: (input) => validaDataNascimento(input),
+  cpf: (input) => validaCPF(input),
+};
+
 export const valida = (input) => {
   const tipoDeInput = input.dataset.tipo;
 
@@ -11,15 +16,15 @@ export const valida = (input) => {
       monstraMensagemErro(tipoDeInput, input);
   } else {
     input.parentElement.classList.remove("input-container--invalido");
-    input.parentElement.querySelector(".input-mensagem-erro").innerHTML = ''
+    input.parentElement.querySelector(".input-mensagem-erro").innerHTML = "";
   }
 };
 
 const tiposDeErro = [
+  "customError",
   "valueMissing",
   "typeMismatch",
   "patternMismatch",
-  "customError",
 ];
 
 const mensagensDeErro = {
@@ -39,11 +44,10 @@ const mensagensDeErro = {
     valueMissing: "O campo de data de nascimento não pode estar vazio",
     customError: "Você deve ser maior que 18 anos para se cadastrar",
   },
-};
 
-const validadores = {
-  dataNascimento: (input) => {
-    validaDataNascimento(input);
+  cpf: {
+    valueMissing: "O campo de CPF não pode estar vazio",
+    customError: "O CPF digitado não é válido",
   },
 };
 
@@ -77,4 +81,70 @@ const maiorQue18 = (data) => {
   );
 
   return dataMais18 <= dataAtual;
+};
+
+const validaCPF = (input) => {
+  const cpfFormatado = input.value.replace(/\D/g, "");
+  let mensagem = "";
+
+  if (!checaCPFRepetido(cpfFormatado) || !checaEstruturaCPF(cpfFormatado)) {
+    mensagem = "O CPF digitado não é válido";
+  }
+  input.setCustomValidity(mensagem);
+};
+
+const checaCPFRepetido = (cpf) => {
+  const valoresRepetidos = [
+    "00000000000",
+    "11111111111",
+    "22222222222",
+    "33333333333",
+    "44444444444",
+    "55555555555",
+    "66666666666",
+    "77777777777",
+    "88888888888",
+    "99999999999",
+  ];
+  let cpfValido = true;
+
+  valoresRepetidos.forEach((valor) => {
+    if (valor == cpf) {
+      cpfValido = false;
+    }
+  });
+
+  return cpfValido;
+};
+
+const checaEstruturaCPF = (cpf) => {
+  const multiplicador = 10;
+
+  return checaDigitoVerificador(cpf, multiplicador);
+};
+
+const confirmaDigito = (soma) => {
+  return 11 - (soma % 11);
+};
+
+const checaDigitoVerificador = (cpf, multiplicador) => {
+  if (multiplicador >= 12) {
+    return true;
+  }
+
+  let multiplicadorInicial = multiplicador;
+  let soma = 0;
+  const cpfSemDigitos = cpf.substr(0, multiplicador - 1).split("");
+  const digitoVerificador = cpf.charAt(multiplicador - 1);
+
+  for (let contador = 0; multiplicadorInicial > 1; multiplicadorInicial--) {
+    soma = soma + cpfSemDigitos[contador] * multiplicadorInicial;
+    contador++;
+  }
+
+  if (digitoVerificador == confirmaDigito(soma)) {
+    return checaDigitoVerificador(cpf, multiplicador + 1);
+  }
+
+  return false;
 };
